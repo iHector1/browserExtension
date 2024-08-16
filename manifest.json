@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "React Auth Extension",
+  "version": "1.0",
+  "description": "Extension with Email, Google, and Microsoft Authentication",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": ["identity", "storage"],
+  "background": {
+    "service_worker": "./src/background.js"
+  },
+  "oauth2": {
+    "client_id": "<YOUR_GOOGLE_CLIENT_ID>",
+    "scopes": ["https://www.googleapis.com/auth/userinfo.email"]
+  },
+  "host_permissions": [
+    "https://www.googleapis.com/*",
+    "https://login.microsoftonline.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
+}
