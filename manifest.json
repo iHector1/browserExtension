@@ -1,24 +1,21 @@
 {
-  "manifest_version": 3,
-  "name": "React Auth Extension",
-  "version": "1.0",
-  "description": "Extension with Email, Google, and Microsoft Authentication",
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "./public/index.html"
   },
-  "permissions": ["identity", "storage"],
-  "background": {
-    "service_worker": "./src/background.js"
+  "permissions": [ "identity" ],
+  "description": "Firebase",
+  "manifest_version": 3,
+  "name": "Firebase",
+  "short_name": "Firebase",
+  "version": "0.1",
+  "web_accessible_resources": [],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; script-src-elem 'self' 'unsafe-inline';"
   },
   "oauth2": {
-    "client_id": "<YOUR_GOOGLE_CLIENT_ID>",
-    "scopes": ["https://www.googleapis.com/auth/userinfo.email"]
-  },
-  "host_permissions": [
-    "https://www.googleapis.com/*",
-    "https://login.microsoftonline.com/*"
-  ],
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self';"
+    "client_id": "277297604892-kcvd9oh53i9c8f9prtff53d1j3i4uske.apps.googleusercontent.com.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/userinfo.email"
+    ]
   }
 }

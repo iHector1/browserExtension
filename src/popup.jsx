@@ -1,24 +1,42 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
+import { auth } from './firebase'; // Asegúrate de tener esta ruta correcta
 import './styles/custom.css';
 
 function Popup() {
   const [loggedIn, setLoggedIn] = useState(false);
 
-  const handleEmailLogin = (e) => {
+  const handleEmailLogin = async (e) => {
     e.preventDefault();
-    // Lógica para el login con correo y contraseña
-    setLoggedIn(true);
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+    
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      setLoggedIn(true);
+    } catch (error) {
+      console.error('Error signing in with email and password', error);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    // Lógica para el login con Google
-    setLoggedIn(true);
+  const handleGoogleLogin = async () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try {
+      await auth.signInWithPopup(provider);
+      setLoggedIn(true);
+    } catch (error) {
+      console.error('Error signing in with Google', error);
+    }
   };
 
-  const handleMicrosoftLogin = () => {
-    // Lógica para el login con Microsoft
-    setLoggedIn(true);
+  const handleMicrosoftLogin = async () => {
+    const provider = new firebase.auth.OAuthProvider('microsoft.com');
+    try {
+      await auth.signInWithPopup(provider);
+      setLoggedIn(true);
+    } catch (error) {
+      console.error('Error signing in with Microsoft', error);
+    }
   };
 
   return (
@@ -29,11 +47,11 @@ function Popup() {
           <form onSubmit={handleEmailLogin}>
             <div className="form-group">
               <label>Email</label>
-              <input type="email" className="form-control" required />
+              <input type="email" name="email" className="form-control" required />
             </div>
             <div className="form-group">
               <label>Password</label>
-              <input type="password" className="form-control" required />
+              <input type="password" name="password" className="form-control" required />
             </div>
             <button type="submit" className="btn btn-primary btn-block">Login</button>
           </form>
@@ -51,4 +69,4 @@ function Popup() {
   );
 }
 
-ReactDOM.render(<Popup />, document.getElementById('root'));
+export default Popup;

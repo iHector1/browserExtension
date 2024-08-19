@@ -1,33 +1,37 @@
+const HtmlWebPackPlugin = require('html-webpack-plugin');
 const path = require('path');
 
-module.exports = {
-  mode: 'development',  // Aquí defines el modo. Puedes cambiarlo a 'production' cuando estés listo para el despliegue.
-  entry: './src/index.js',
+module.exports = (env, options) => ({
+  entry: [
+    'babel-polyfill',
+    './src/index.js',
+  ],
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
+    path: path.join(__dirname, 'public'),
+    filename: `app.js?${(+new Date).toString(32).substr(-5)}`,
   },
   module: {
     rules: [
       {
-        test: /\.js$|jsx/,  // Añadir soporte para archivos .js y .jsx
+        test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
-        },
+          loader: 'babel-loader'
+        }
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
-      },
-    ],
+        use: [
+          'style-loader',
+          'css-loader'
+        ]
+      }
+    ]
   },
-  resolve: {
-    extensions: ['.js', '.jsx'],  // Asegúrate de que Webpack resuelva archivos .js y .jsx
-  },
-  devServer: {
-    contentBase: path.join(__dirname, 'public'),
-    compress: true,
-    port: 9000,
-  },
-};
+  plugins: [
+    new HtmlWebPackPlugin({
+      template: './src/index.html',
+      filename: './index.html',
+    })
+  ]
+});
