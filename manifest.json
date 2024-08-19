@@ -1,21 +1,21 @@
 {
-  "action": {
-    "default_popup": "./public/index.html"
-  },
-  "permissions": [ "identity" ],
-  "description": "Firebase",
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Firebase",
   "short_name": "Firebase",
   "version": "0.1",
-  "web_accessible_resources": [],
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; script-src-elem 'self' 'unsafe-inline';"
+  "description": "Firebase",
+  "permissions": ["identity"],
+  "browser_action": {
+    "default_popup": "./public/index.html"
   },
   "oauth2": {
-    "client_id": "277297604892-kcvd9oh53i9c8f9prtff53d1j3i4uske.apps.googleusercontent.com.apps.googleusercontent.com",
+    "client_id": "277297604892-kcvd9oh53i9c8f9prtff53d1j3i4uske.apps.googleusercontent.com",
     "scopes": [
       "https://www.googleapis.com/auth/userinfo.email"
     ]
-  }
+  },
+  "web_accessible_resources": [
+    "public/*"
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-inline'; object-src 'self';"
 }

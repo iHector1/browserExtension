@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword, signInWithCredential, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, signInWithCredential ,GoogleAuthProvider} from 'firebase/auth';
 import { firebaseConfig } from './firebase';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -17,16 +17,20 @@ const App = () => {
 
   const handleGoogleSignIn = e => {
     console.log("hola");
-        const provider = new GoogleAuthProvider();
-        signInWithCredential(auth, provider)
-            .then(userCredential => {
-                console.log('signed in with Google!');
-                setUser(userCredential.user);
-                setError('');
-            })
-            .catch(error => {
-                setError(error.message);
-            });
+    chrome.identity.getAuthToken({ interactive: true }, async function (token) {
+      if (chrome.runtime.lastError || !token) {
+        console.error(chrome.runtime.lastError.message)
+        return
+      }
+      if (token) {
+        const credential = GoogleAuthProvider.credential(null, token)
+        try {
+          await signInWithCredential(auth, credential)
+        } catch (e) {
+          console.error("Could not log in. ", e)
+        }
+      }
+    })
   };
 
   const handleEmailSignIn = e => {
