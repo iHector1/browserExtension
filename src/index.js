@@ -4,6 +4,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, signInWithCredential, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 import { firebaseConfig } from './firebase';
+import CryptoJS from 'crypto-js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Inicializar Firebase
@@ -18,9 +19,12 @@ const App = () => {
   const [error, setError] = React.useState('');
   const [showLogin, setShowLogin] = React.useState(true);
   const [links, setLinks] = React.useState([]);
+  const [registerLink, setRegisterLink] = React.useState(''); // Estado para el enlace de registro
+  const [registerName, setRegisterName] = React.useState(''); // Estado para el nombre de registro
+  // Clave secreta desde el archivo .env
+  const secretKey = process.env.REACT_APP_SECRET_KEY;
 
   const handleGoogleSignIn = e => {
-    console.log("Iniciando con Google");
     chrome.identity.getAuthToken({ interactive: true }, async function (token) {
       if (chrome.runtime.lastError || !token) {
         console.error(chrome.runtime.lastError.message);
@@ -42,7 +46,6 @@ const App = () => {
     e.preventDefault();
     signInWithEmailAndPassword(auth, email, password)
       .then(userCredential => {
-        console.log('Iniciado con email');
         setUser(userCredential.user);
         setError('');
       })
@@ -52,23 +55,55 @@ const App = () => {
   };
 
   const fetchLinks = async () => {
-    console.log("si doy links");
-    const q = query(collection(db, "links"), where("nombre_link", "==", "main"));
-    const querySnapshot = await getDocs(q);
-    const linksArray = [];
-    querySnapshot.forEach((doc) => {
-      linksArray.push(doc.data());
-    });
-    setLinks(linksArray);
+    try {
+      const q = query(collection(db, "links"));
+      const querySnapshot = await getDocs(q);
+      const linksArray = [];
+      let registerLinkTemp = '';
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+      if (data.nombre_link === "registro") {
+          registerLinkTemp = data.link;  // Asigna el enlace de registro
+          
+        }else{
+            linksArray.push(data);
+        }
+      });
+
+      setLinks(linksArray);
+      setRegisterLink(registerLinkTemp);  // Actualiza el estado con el enlace de registro
+
+      // Agregar logs para depuración
+      console.log("Links:", linksArray);
+      console.log("Register Link:", registerLinkTemp);
+    } catch (error) {
+      console.error("Error fetching links: ", error);
+    }
   };
-  function handleLinkClick(link) {
-    // Lógica para manejar el clic en el enlace
-    console.log("Enlace clicado:", link);
- // Abrir el enlace en una ventana emergente en pantalla completa
- const screenWidth = window.screen.width;
- const screenHeight = window.screen.height;
- window.open(link, '_blank', `toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=${screenWidth},height=${screenHeight}`);
+
+  const encryptEmail = (email) => {
+    // Concatenar email con la clave secreta y encriptar usando SHA-256
+    const hash = CryptoJS.SHA256(email + secretKey).toString();
+    return hash;
+  };
+  const handleRegisterLink=(link)=>{
+    const screenWidth = window.screen.width;
+    const screenHeight = window.screen.height;
+    window.open(link, '_blank', `toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=${screenWidth},height=${screenHeight}`);
   }
+
+  const handleLinkClick = (link) => {
+    if (user && user.email) {
+      const encryptedEmail = encryptEmail(user.email);
+
+      const screenWidth = window.screen.width;
+      const screenHeight = window.screen.height;
+      const urlWithParams = `${link}?email=${encodeURIComponent(encryptedEmail)}`; // Añade el correo encriptado a la URL
+      window.open(urlWithParams, '_blank', `toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=${screenWidth},height=${screenHeight}`);
+    }
+  };
+
   React.useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       setUser(user ? user : null);
@@ -78,7 +113,8 @@ const App = () => {
 
   React.useEffect(() => {
     if (user) {
-      console.log("si entro");
+      fetchLinks();
+    }else{
       fetchLinks();
     }
   }, [user]);
@@ -86,25 +122,27 @@ const App = () => {
   if (user === undefined) return <div className="container mt-5"><h1>Cargando...</h1></div>;
 
   if (user) return (
-<div className="container mt-5">
-  <h1>Bienvenido a LearnBoard</h1>
-  
-    {links.map((link, index) => (
-      <button key={index} className="btn btn-success mb-3 w-100mb-3 w-100" onClick={() => handleLinkClick(link.link)}>
-        {link.nombre}
-      </button>
-    ))}
-    <button className="btn btn-primary w-100" onClick={() => auth.signOut()}>Cerrar Sesión</button>
-  </div>
+    <div className="container mt-5">
+      <h1>Bienvenido a LearnBoard</h1>
+      {links.map((link, index) => (
+        <button key={index} className="btn btn-success mb-3 w-100" onClick={() => handleLinkClick(link.link)}>
+          {link.nombre}
+        </button>
+      ))}
+      <button className="btn btn-secondary mt-3 mb-5 w-100" onClick={() => auth.signOut()}>Cerrar Sesión</button>
+    </div>
   );
 
   return (
     <div className="container mt-5">
-      <h1>Iniciar Sesión</h1>
+      <h1 className='mb-3'>Iniciar Sesión</h1>
       {showLogin ? (
         <div>
-          <button className="btn btn-danger mb-3 w-100" onClick={() => setShowLogin(false)}>Iniciar sesión con Email</button>
-          <button className="btn btn-primary w-100" onClick={handleGoogleSignIn}>Iniciar sesión con Google</button>
+          <button className="btn btn-primary mb-3 w-100" onClick={() => setShowLogin(false)}>Iniciar sesión con Email</button>
+          <button className="btn btn-danger w-100" onClick={handleGoogleSignIn}>Iniciar sesión con Google</button>
+          {registerLink && ( // Renderiza el botón de "Registrarse" solo si se ha recuperado el enlace
+            <button className="btn btn-success mt-3 mb-5 w-100" onClick={() => handleRegisterLink(registerLink)}>Registrarse</button>
+          )}
         </div>
       ) : (
         <form onSubmit={handleEmailSignIn}>
@@ -132,7 +170,7 @@ const App = () => {
           </div>
           {error && <div className="alert alert-danger" role="alert">{error}</div>}
           <button type="submit" className="btn btn-primary w-100">Iniciar Sesión</button>
-          <button type="button" className="btn btn-secondary mt-2 w-100" onClick={() => setShowLogin(true)}>Volver a Google</button>
+          <button type="button" className="btn btn-secondary mt-3 mb-5 w-100" onClick={() => setShowLogin(true)}>Volver</button>
         </form>
       )}
     </div>

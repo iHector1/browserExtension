@@ -1,15 +1,17 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "LearnBoard",
   "short_name": "LearnBoard",
   "version": "0.1",
-  "description": "LearnBoard is a chrome extension that helps you to save your learning resources and notes.",
+"description": "Extensión de autenticación para una pizarra en línea educativa, con inicio de sesión seguro por correo o Google.",
   "permissions": [
     "identity",
-    "storage",
+    "storage"
+  ],
+  "host_permissions": [
     "https://firestore.googleapis.com/"
   ],
-  "browser_action": {
+  "action": {
     "default_popup": "./public/index.html",
     "default_icon": {
       "16": "icons/icon.png",
@@ -29,7 +31,12 @@
     ]
   },
   "web_accessible_resources": [
-    "public/*"
+    {
+      "resources": ["public/*"],
+      "matches": ["<all_urls>"]
+    }
   ],
-  "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com; object-src 'self'"
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'"
+  }
 }

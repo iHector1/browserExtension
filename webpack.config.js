@@ -1,6 +1,6 @@
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const path = require('path');
-
+const webpack = require('webpack');
 module.exports = (env, options) => ({
   entry: [
     'babel-polyfill',
@@ -32,6 +32,9 @@ module.exports = (env, options) => ({
     new HtmlWebPackPlugin({
       template: './src/index.html',
       filename: './index.html',
-    })
+    }),
+    new webpack.DefinePlugin({
+      'process.env.REACT_APP_SECRET_KEY': JSON.stringify(process.env.REACT_APP_SECRET_KEY),
+    }),
   ]
 });
