@@ -1,5 +1,2 @@
-/dist
-/node_modules
-src/firebase.js
-.env
-/public
+node_modules
+dist/
