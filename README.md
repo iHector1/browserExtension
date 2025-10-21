@@ -153,8 +153,6 @@ Code Snippet:
    3. Click on `Load unpacked` extension
    4. Select the `dist` folder
 
-Note: `gitignore` will help ignore the `node_modules` and `dist` folder to be pushed to the github
- 
   
 -----
 [Blog](https://rasikawarade.github.io/think-rethink-reinforce/chrome-extension/firebase/webpack/2022/02/06/firebase-auth-chrome-webpack.html) | [Rasika Warade](https://rasikawarade.github.io/)
