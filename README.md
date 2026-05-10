@@ -22,7 +22,7 @@ When I built my Chrome Extension, I had limited experience with webpack, and I b
 
 Including Firebase libraries is an example. 
 
-There are lots of changes already from moving MV2 to MV3 version for chrome extension. At the same time, firebase latest version suggests using SDK9 which needs module bundler support. I could not find guideline and hit few issues , that I will list down below going over the documentation. As of today 31, Jan 2022, the documentation support for including firebase SDK9 in Chrome Extension is still confusing. 
+There are lots of changes already from moving MV2 to MV3 version for chrome extension. At the same time, firebase latest version suggests using SDK9 which needs module bundler support. I could not find guideline and hit few issues, that I will list down below going over the documentation. As of today 31, Jan 2022, the documentation support for including firebase SDK9 in Chrome Extension is still confusing. 
 
 Issues:
 - As a beginner I would have preferred using their built in sign in `firebase-ui` library, [FirebaseUI  functionality](https://firebase.google.com/docs/auth/web/firebaseui). I can confirm this does not work at the moment, as this library does not support the optimizations of module bundling.
